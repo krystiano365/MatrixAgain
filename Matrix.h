@@ -15,10 +15,15 @@ using namespace std;
 class Matrix {
 private:
 	struct rcm;
-	rcm *data;
+	void detachPointer();
+	void destroyData();
 public:
-	Matrix(size_t rows, size_t columns);
+	rcm *data;
+	Matrix();
+	Matrix(const Matrix &m);
+	Matrix(size_t rows, size_t columns, double filling = 0);
 	~Matrix();
+	void operator= (const Matrix &m);
 	friend ostream & operator<< (ostream &s, const Matrix &m);
 };
 
