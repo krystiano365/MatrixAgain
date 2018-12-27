@@ -106,6 +106,28 @@ void Matrix::operator=(const Matrix &m) {
 	m.data->references++;
 }
 
+Matrix &Matrix::operator+=(const Matrix &m) {
+
+	if(data && m.data) {
+		if (this->data->rows_no == m.data->rows_no && this->data->columns_no == m.data->columns_no){
+
+			this->detachPointer();
+
+			for(size_t r = 0; r < this->data->rows_no; r++){
+				for(size_t c = 0; c < this->data->columns_no; c++){
+					this->data->matrix[r][c] += m.data->matrix[r][c];
+				}
+			}
+
+			return *this;
+		} else {
+			throw AdditionDifferentSizesException(this->data->rows_no,
+					this->data->columns_no,
+					m.data->rows_no,
+					m.data->columns_no);
+		}
+	}
+}
 //====================================================================================================================== METHODS
 //----------------------------------------------------------------------------------------------------------------------
 //====================================================================================================================== FRIEND FUNCTIONS
@@ -135,6 +157,7 @@ ostream & operator<<(ostream &s, const Matrix &m) {
 		return s;
 	}
 }
+
 
 
 
