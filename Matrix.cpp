@@ -68,7 +68,7 @@ Matrix::~Matrix() {
 	if(data != nullptr) {
 
 		data->references--;
-
+		cout<< "destructor called"<< endl;
 		destroyData();
 	}
 }
@@ -80,6 +80,7 @@ Matrix::~Matrix() {
 void Matrix::destroyData() {
 	if(data->references == 0){
 		delete data;
+		cout<<"data destroyed"<<endl;
 	} else {
 		data = nullptr;
 	}
@@ -92,6 +93,18 @@ void Matrix::detachPointer() {
 			this->data = new rcm(this->data->rows_no, this->data->columns_no, this->data->matrix);
 		} // jesli brak odniesien ale licznik references nadal wskazuje, ze istnieje jedno odniesienie, wtedy
 		  // zaczyna sprzatac destruktor. Odejmuje 1, sprawdza czy references = 0 i usuwa dane.
+	}
+}
+
+Matrix Matrix::operator-() const{
+	if(data != nullptr) {
+		Matrix aux (this->data->rows_no, this->data->columns_no);
+		for (size_t r = 0; r < this->data->rows_no; r++) {
+			for (size_t c = 0; c < this->data->columns_no; c++) {
+				aux.data->matrix[r][c] = -(this->data->matrix[r][c]);
+			}
+		}
+		return aux;
 	}
 }
 
@@ -128,6 +141,12 @@ Matrix &Matrix::operator+=(const Matrix &m) {
 		}
 	}
 }
+
+Matrix &Matrix::operator-=(const Matrix &m) {
+	Matrix aux(-m);
+	*this += aux;
+}
+
 //====================================================================================================================== METHODS
 //----------------------------------------------------------------------------------------------------------------------
 //====================================================================================================================== FRIEND FUNCTIONS
@@ -157,6 +176,8 @@ ostream & operator<<(ostream &s, const Matrix &m) {
 		return s;
 	}
 }
+
+
 
 
 

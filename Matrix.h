@@ -24,6 +24,7 @@ public:
 	Matrix(size_t rows, size_t columns, double filling = 0);
 	~Matrix();
 	void operator= (const Matrix &m);
+	Matrix operator- () const;
 	Matrix & operator+= (const Matrix &m);
 	Matrix & operator-= (const Matrix &m);
 	Matrix & operator*= (const Matrix &m);
@@ -33,6 +34,8 @@ public:
 	bool operator== (const Matrix &m);
 	friend ostream & operator<< (ostream &s, const Matrix &m);
 };
+
+
 
 class DifferentSizesException : public exception { };
 
