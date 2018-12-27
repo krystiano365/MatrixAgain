@@ -1,6 +1,10 @@
 #include <iostream>
+#include "Matrix.h"
+
+using namespace std;
 
 int main() {
-	std::cout << "Hello, World!" << std::endl;
+	Matrix m(3, 5);   // 3x5 matrix
+	cout << m << endl;
 	return 0;
 }
