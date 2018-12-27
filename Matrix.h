@@ -28,8 +28,8 @@ public:
 	Matrix & operator+= (const Matrix &m);
 	Matrix & operator-= (const Matrix &m);
 	Matrix & operator*= (const Matrix &m);
-	Matrix & operator+ (const Matrix &m);
-	Matrix & operator- (const Matrix &m);
+	Matrix operator+ (const Matrix &m);
+	Matrix operator- (const Matrix &m);
 	Matrix & operator* (const Matrix &m);
 	bool operator== (const Matrix &m);
 	friend ostream & operator<< (ostream &s, const Matrix &m);

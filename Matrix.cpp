@@ -106,6 +106,7 @@ Matrix Matrix::operator-() const{
 		}
 		return aux;
 	}
+	return *this;
 }
 
 void Matrix::operator=(const Matrix &m) {
@@ -140,11 +141,25 @@ Matrix &Matrix::operator+=(const Matrix &m) {
 					m.data->columns_no);
 		}
 	}
+	return *this;
 }
 
 Matrix &Matrix::operator-=(const Matrix &m) {
 	Matrix aux(-m);
 	*this += aux;
+	return *this;
+}
+
+Matrix Matrix::operator+(const Matrix &m) {
+	Matrix newMat(*this);
+	newMat += m;
+	return Matrix(newMat);
+}
+
+Matrix Matrix::operator-(const Matrix &m) {
+	Matrix newMat(*this);
+	newMat -= m;
+	return Matrix(newMat);
 }
 
 //====================================================================================================================== METHODS
@@ -176,6 +191,10 @@ ostream & operator<<(ostream &s, const Matrix &m) {
 		return s;
 	}
 }
+
+
+
+
 
 
 
