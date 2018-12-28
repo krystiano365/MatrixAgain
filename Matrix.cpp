@@ -80,7 +80,6 @@ Matrix::~Matrix() {
 void Matrix::destroyData() {
 	if(data->references == 0){
 		delete data;
-		cout<<"data destroyed"<<endl;
 	} else {
 		data = nullptr;
 	}
@@ -150,17 +149,76 @@ Matrix &Matrix::operator-=(const Matrix &m) {
 	return *this;
 }
 
-Matrix Matrix::operator+(const Matrix &m) {
+Matrix &Matrix::operator*=(const Matrix &m) {
+	if (this->data && m.data) {
+		if (this->data->columns_no == m.data->rows_no) {
+
+			this->detachPointer();
+
+			size_t rows, columns;
+			if (this->data->columns_no != 0) {
+				rows = this->data->rows_no;
+				columns = m.data->columns_no;
+			} else {
+				rows = columns = 0;
+			}
+			Matrix result(rows, columns);
+			for (unsigned int k = 0; k < rows; k++) {
+				for (unsigned int j = 0; j < columns; j++) {
+					for (unsigned int i = 0; i < this->data->columns_no; i++) {
+						result.data->matrix[k][j] += (this->data->matrix[k][i] * m.data->matrix[i][j]);
+					}
+				}
+			}
+			*this = result;
+		} else {
+			throw MultiplicationDifferentSizesException(data->rows_no, data->columns_no, m.data->rows_no,
+														m.data->columns_no);
+		}
+	}
+	return *this;
+}
+
+Matrix Matrix::operator+(const Matrix &m) const{
 	Matrix newMat(*this);
 	newMat += m;
 	return Matrix(newMat);
 }
 
-Matrix Matrix::operator-(const Matrix &m) {
+Matrix Matrix::operator-(const Matrix &m) const{
 	Matrix newMat(*this);
 	newMat -= m;
 	return Matrix(newMat);
 }
+
+Matrix Matrix::operator*(const Matrix &m) const{
+	Matrix newMat(*this);
+	newMat *= m;
+	return Matrix(newMat);
+}
+
+bool Matrix::operator==(const Matrix &m) const {
+	if (this->data && m.data) {
+		if (this->data == m.data) {
+			return true;
+		} else if(this->data->rows_no == m.data->rows_no && this->data->columns_no == m.data->columns_no) {
+			for (size_t r = 0; r < this->data->rows_no; r++) {
+				for (size_t c = 0; c < this->data->columns_no; c++) {
+					if (this->data->matrix[r][c] != m.data->matrix[r][c]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Matrix::operator!=(const Matrix &m) const {
+	return !(*this == m);
+}
+
 
 //====================================================================================================================== METHODS
 //----------------------------------------------------------------------------------------------------------------------
@@ -191,18 +249,6 @@ ostream & operator<<(ostream &s, const Matrix &m) {
 		return s;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //====================================================================================================================== FRIEND FUNCTIONS
