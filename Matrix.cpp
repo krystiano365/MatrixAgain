@@ -46,6 +46,28 @@ struct Matrix::rcm{
 
 //====================================================================================================================== MEMBER CLASSES
 //----------------------------------------------------------------------------------------------------------------------
+//====================================================================================================================== PRIVATE METHODS
+
+void Matrix::destroyData() {
+	if(data->references == 0){
+		delete data;
+	} else {
+		data = nullptr;
+	}
+}
+
+void Matrix::detachPointer() {
+	if(this->data != nullptr){
+		if(this->data->references > 1){   //jesli jest wiecej niz jedno odniesienie do tych danych, to
+			this->data->references--;	  //zmniejszam ilosc odniesien o 1 i tworze nowa instancje z danymi
+			this->data = new rcm(this->data->rows_no, this->data->columns_no, this->data->matrix);
+		} // jesli brak odniesien ale licznik references nadal wskazuje, ze istnieje jedno odniesienie, wtedy
+		  // zaczyna sprzatac destruktor. Odejmuje 1, sprawdza czy references = 0 i usuwa dane.
+	}
+}
+
+//====================================================================================================================== PRIVATE METHODS
+//----------------------------------------------------------------------------------------------------------------------
 //====================================================================================================================== CONSTRUCTORS
 
 Matrix::Matrix() {
@@ -75,25 +97,7 @@ Matrix::~Matrix() {
 
 //====================================================================================================================== CONSTRUCTORS
 //----------------------------------------------------------------------------------------------------------------------
-//====================================================================================================================== METHODS
-
-void Matrix::destroyData() {
-	if(data->references == 0){
-		delete data;
-	} else {
-		data = nullptr;
-	}
-}
-
-void Matrix::detachPointer() {
-	if(this->data != nullptr){
-		if(this->data->references > 1){   //jesli jest wiecej niz jedno odniesienie do tych danych, to
-			this->data->references--;	  //zmniejszam ilosc odniesien o 1 i tworze nowa instancje z danymi
-			this->data = new rcm(this->data->rows_no, this->data->columns_no, this->data->matrix);
-		} // jesli brak odniesien ale licznik references nadal wskazuje, ze istnieje jedno odniesienie, wtedy
-		  // zaczyna sprzatac destruktor. Odejmuje 1, sprawdza czy references = 0 i usuwa dane.
-	}
-}
+//====================================================================================================================== PUBLIC METHODS
 
 Matrix Matrix::operator-() const{
 	if(data != nullptr) {
@@ -220,7 +224,7 @@ bool Matrix::operator!=(const Matrix &m) const {
 }
 
 
-//====================================================================================================================== METHODS
+//====================================================================================================================== PUBLIC METHODS
 //----------------------------------------------------------------------------------------------------------------------
 //====================================================================================================================== FRIEND FUNCTIONS
 
@@ -248,6 +252,38 @@ ostream & operator<<(ostream &s, const Matrix &m) {
 		s << "[none]"  << endl;
 		return s;
 	}
+}
+
+istream &operator>> (istream &in, Matrix &m) {
+	size_t rows = 0, columns = 0;
+	if (m.data == nullptr) {
+		if (&in == &cin) {
+			cout << "Input number of rows: \n";
+			if (!(in >> rows))
+				throw WrongIntInputException();
+
+			cout << "Input number of columns: \n";
+			if (!(in >> columns))
+				throw WrongIntInputException();
+
+			m.data = new Matrix::rcm(rows, columns);
+		}
+	} else {
+		rows = m.data->rows_no;
+		columns = m.data->columns_no;
+	}
+
+	if (&in == &cin){
+		for (size_t r = 0; r < rows; r++) {
+			for (size_t c = 0; c < columns; c++) {
+
+				cout << "Input matrix value at (" << r+1 << ", " << c+1 << ") <rows, columns>" << endl;
+				if (!(in >> m.data->matrix[r][c]))
+					throw WrongDoubleInputException();
+			}
+		}
+	}
+	return in;
 }
 
 

@@ -34,6 +34,7 @@ public:
 	bool operator== (const Matrix &m) const;
 	bool operator!= (const Matrix &m) const;
 	friend ostream & operator<< (ostream &s, const Matrix &m);
+	friend istream & operator>> (istream &in, Matrix &m);
 };
 
 
@@ -65,4 +66,17 @@ public:
 	}
 };
 
+class WrongDoubleInputException : public exception {
+public:
+	const char* what() const noexcept override {
+		return ">>>>>>>ERROR<<<<<<<\nImproper input type: input should be of type double\n";
+	}
+};
+
+class WrongIntInputException : public exception {
+public:
+	const char* what() const noexcept override {
+		return ">>>>>>>ERROR<<<<<<<\nImproper input type: input should be of type int\n";
+	}
+};
 #endif //MATRIXAGAIN_MATRIX_H
