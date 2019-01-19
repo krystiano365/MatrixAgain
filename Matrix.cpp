@@ -9,40 +9,49 @@
 //
 //====================================================================================================================== MEMBER CLASSES
 
-struct Matrix::rcm{
 
-	double **matrix;
-	size_t rows_no, columns_no;
-	unsigned int references;
-
-	rcm(size_t rows, size_t columns, double filling = 0) : columns_no(columns), rows_no(rows){
-		references = 1;
-		matrix = new double*[rows_no];
-		for(size_t r = 0; r < rows_no; r++) {
-			matrix[r] = new double[columns_no];
-			for (size_t c = 0; c < columns_no; c++)
-				matrix[r][c] = filling;
-		}
-	};
-
-	rcm(size_t rows, size_t columns, double** data) : columns_no(columns), rows_no(rows){
-		references = 1;
-		matrix = new double*[rows_no];
-		for(size_t r = 0; r < rows_no; r++) {
-			matrix[r] = new double[columns_no];
-			for (size_t c = 0; c < columns_no; c++)
-				matrix[r][c] = data[r][c];
-		}
-	};
-
-	~rcm(){
-		for(size_t r = 0; r < rows_no; r++){
-			delete[] matrix[r];
-		}
-		delete[] matrix;
-
-	};
+Matrix::rcm::rcm(size_t rows, size_t columns, double filling) : columns_no(columns), rows_no(rows){
+	references = 1;
+	matrix = new double*[rows_no];
+	for(size_t r = 0; r < rows_no; r++) {
+		matrix[r] = new double[columns_no];
+		for (size_t c = 0; c < columns_no; c++)
+			matrix[r][c] = filling;
+	}
 };
+
+Matrix::rcm::rcm(size_t rows, size_t columns, double** data) : columns_no(columns), rows_no(rows){
+	references = 1;
+	matrix = new double*[rows_no];
+	for(size_t r = 0; r < rows_no; r++) {
+		matrix[r] = new double[columns_no];
+		for (size_t c = 0; c < columns_no; c++)
+			matrix[r][c] = data[r][c];
+	}
+};
+
+Matrix::rcm::~rcm(){
+	for(size_t r = 0; r < rows_no; r++){
+		delete[] matrix[r];
+	}
+	delete[] matrix;
+
+};
+
+Matrix::Proxy::operator double() const
+{
+	return m.data->matrix[row][column];
+}
+
+Matrix::Proxy & Matrix::Proxy::operator=(double n) {
+	m.detachPointer();
+	m.data->matrix[row][column] = n;
+	return *this;
+}
+
+Matrix::Proxy & Matrix::Proxy::operator=(const Matrix::Proxy& reference) {
+	return operator=((double)reference);
+}
 
 //====================================================================================================================== MEMBER CLASSES
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,6 +130,10 @@ void Matrix::operator=(const Matrix &m) {
 
 	this->data = m.data;
 	m.data->references++;
+}
+
+Matrix::Proxy Matrix::operator()(size_t r, size_t c) {
+	return Proxy(*this, r, c);
 }
 
 Matrix &Matrix::operator+=(const Matrix &m) {
@@ -285,6 +298,7 @@ istream &operator>> (istream &in, Matrix &m) {
 	}
 	return in;
 }
+
 
 
 //====================================================================================================================== FRIEND FUNCTIONS

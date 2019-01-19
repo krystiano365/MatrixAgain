@@ -15,6 +15,7 @@ using namespace std;
 class Matrix {
 private:
 	struct rcm;
+	class Proxy;
 	void detachPointer();
 	void destroyData();
 public:
@@ -24,6 +25,7 @@ public:
 	Matrix(size_t rows, size_t columns, double filling = 0);
 	~Matrix();
 	void operator= (const Matrix &m);
+	Proxy operator() (size_t r, size_t c);
 	Matrix operator- () const;
 	Matrix & operator+= (const Matrix &m);
 	Matrix & operator-= (const Matrix &m);
@@ -37,6 +39,26 @@ public:
 	friend istream & operator>> (istream &in, Matrix &m);
 };
 
+struct Matrix::rcm{
+	double **matrix;
+	size_t rows_no, columns_no;
+	unsigned int references;
+	rcm(size_t rows, size_t columns, double filling = 0);
+	rcm(size_t rows, size_t columns, double** data);
+	~rcm();
+};
+
+class Matrix::Proxy{
+private:
+	//friend class Matrix;
+	Matrix& m;
+	size_t row, column;
+public:
+	Proxy(Matrix& mat, size_t r, size_t c): m(mat), column(c), row(r) {}
+	operator double() const;
+	Proxy& operator=(double n);
+	Proxy& operator=(const Proxy&);
+};
 
 
 class DifferentSizesException : public exception { };
